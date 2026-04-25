@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Договор аренды | ORiIO System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            row-gap: 0.85rem;
+            flex: 1;
+        }
+
+        .brand {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            white-space: nowrap;
+            border-right: 1px solid #cbd5e1;
+            padding-right: 1rem;
+            margin-right: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            height: 52px;
+        }
+
+        .nav-btn, .dropdown-btn, .login-btn, .dropdown-item {
+            background-color: #667eea;
+            border: none;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-family: inherit;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0px;
+            width: 160px;
+            min-width: 160px;
+            max-width: 160px;
+            height: 52px;
+            padding: 0.5rem 0.6rem;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .dropdown-item {
+            width: 100%;
+            min-width: 160px;
+            text-align: left;
+            justify-content: flex-start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: normal;
+            word-break: break-word;
+            height: 52px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-btn:hover, .dropdown-btn:hover, .login-btn:hover, .dropdown-item:hover {
+            background-color: #5a6fd6;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            display: inline-block;
+            margin-left: 8px;
+            font-family: monospace;
+        }
+
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            width: 100%;
+            border-radius: 0px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, visibility 0.2s, transform 0.2s;
+            z-index: 50;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .dropdown.active .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 50px auto 40px;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .form-wrapper {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            background-color: #667eea;
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 2px solid #5a67d8;
+        }
+
+        .form-header h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #e2e8f0;
+        }
+
+        .form-body {
+            padding: 35px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #cbd5e0;
+            background-color: #f7fafc;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+
+        input:disabled, input.readonly-mode {
+            background-color: #edf2f7;
+            color: #4a5568;
+            cursor: not-allowed;
+            border-color: #cbd5e0;
+        }
+
+        .submit-group {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #5a67d8;
+            transition: background 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #5a67d8;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background-color: #718096;
+            border-color: #4a5568;
+        }
+
+        .cancel-btn:hover:not(:disabled) {
+            background-color: #4a5568;
+        }
+
+        .back-btn {
+            background-color: #48bb78;
+            border-color: #38a169;
+        }
+
+        .back-btn:hover:not(:disabled) {
+            background-color: #38a169;
+        }
+
+        .table-container {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            overflow-x: auto;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto 40px auto;
+        }
+
+        .table-header {
+            background-color: #667eea;
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 2px solid #5a67d8;
+        }
+
+        .table-header h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .table-header p {
+            color: #e2e8f0;
+        }
+
+        .button-group {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #4a5caa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4555a5;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .payment-table th {
+            background-color: #edf2f7;
+            color: #2d3748;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        .payment-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .payment-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .view-btn {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 90px;
+        }
+        .view-btn:hover {
+            background-color: #3182ce;
+        }
+
+        .edit-btn {
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 90px;
+        }
+        .edit-btn:hover {
+            background-color: #38a169;
+        }
+
+        .delete-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 90px;
+        }
+        .delete-btn:hover {
+            background-color: #c53030;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s;
+        }
+
+        .view-modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background-color: #667eea;
+            color: white;
+            padding: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .view-field {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .view-field strong {
+            display: inline-block;
+            width: 200px;
+            color: #2d3748;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .close:hover {
+            color: #e2e8f0;
+        }
+
+        footer {
+            background-color: #2d3748;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 0;
+            border-top: 2px solid #4a5568;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; gap: 15px; }
+            .form-body { padding: 20px; }
+            .view-field strong { width: 140px; }
+            .action-buttons { flex-direction: column; align-items: stretch; }
+            .view-btn, .edit-btn, .delete-btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-container">
+        <div class="nav-row">
+            <div class="brand">ORiIO</div>
+            <button class="nav-btn" id="homeBtn">Главная</button>
+            <button class="nav-btn" id="ownersBtn">Правообладатели</button>
+            <button class="nav-btn" id="arendBtn">Договоры аренды</button>
+            <button class="nav-btn" id="gratisBtn">Безвозмездное пользование</button>
+            <div class="dropdown" id="propertyDropdown">
+                <button class="dropdown-btn" id="dropdownToggle" aria-haspopup="true" aria-expanded="false">
+                    Имущество <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-content" role="menu">
+                    <button class="dropdown-item" data-property="movable">Движимое</button>
+                    <button class="dropdown-item" data-property="immovable">Недвижимое</button>
+                </div>
+            </div>
+            <button class="login-btn" id="loginBtn">Вход</button>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="form-wrapper" id="formWrapper">
+            <div class="form-header">
+                <h1 id="formTitle">Регистрация договора аренды</h1>
+                <p id="formDescription">Заполните форму ниже для регистрации нового договора аренды в системе. Все поля, отмеченные звездочкой (*), обязательны для заполнения.</p>
+            </div>
+            <div class="form-body">
+                <form class="form-grid" id="contractForm">
+                    <div class="form-group">
+                        <label for="Dogovor_number" class="required">Номер договора</label>
+                        <input id="Dogovor_number" name="Dogovor_number" type="text" placeholder="Введите номер" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="INN" class="required">ИНН компании</label>
+                        <input id="INN" name="INN" type="text" placeholder="10 или 12 цифр" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ID_entities" class="required">ID юридического лица</label>
+                        <input id="ID_entities" name="ID_entities" type="number" placeholder="Введите ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Date_of_dogovor" class="required">Дата заключения договора</label>
+                        <input id="Date_of_dogovor" name="Date_of_dogovor" type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Start_date" class="required">Дата начала договора</label>
+                        <input id="Start_date" name="Start_date" type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="End_date" class="required">Дата окончания договора</label>
+                        <input id="End_date" name="End_date" type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Fee" class="required">Размер ежемесячной оплаты</label>
+                        <input id="Fee" name="Fee" type="number" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Property_transfer_date">Дата передачи имущества</label>
+                        <input id="Property_transfer_date" name="Property_transfer_date" type="date">
+                    </div>
+                    <div class="form-group full-width submit-group">
+                        <button type="submit" id="submitBtn">Подтвердить регистрацию</button>
+                        <button type="button" id="cancelBtn" class="cancel-btn" style="display: none;">Отмена</button>
+                        <button type="button" id="backToTableBtn" class="back-btn" style="display: none;">Вернуться к таблице</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Таблица платежей -->
+    <div class="table-container">
+        <div class="table-header">
+            <h1>Управление платежами</h1>
+            <p>Добавляйте, редактируйте, просматривайте и удаляйте записи о платежах. Все данные сохраняются автоматически.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Добавить платеж</button>
+            </div>
+        </div>
+        <table class="payment-table">
+            <thead>
+                <tr><th>№ платежа</th><th>№ договора</th><th>КБК</th><th>Сумма платежа</th><th>Дата платежа</th><th>Действия</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Таблица документов -->
+    <div class="table-container">
+        <div class="table-header">
+            <h1>Управление документами</h1>
+            <p>Типы документов: «Уведомление» или «Претензия». Все изменения сохраняются автоматически.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="openDocAddModal()">+ Добавить документ</button>
+            </div>
+        </div>
+        <table class="payment-table">
+            <thead>
+                <tr><th>ID документа</th><th>Тип документа</th><th>Детали</th><th>Действия</th></tr>
+            </thead>
+            <tbody id="docTableBody"></tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Модальное окно для платежей -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span class="close" onclick="closeModal()">&times;</span><h2 id="modalTitle">Добавить платеж</h2></div>
+        <div class="modal-body">
+            <input type="hidden" id="editId">
+            <div class="form-group"><label class="required">Номер платежа</label><input type="text" id="payment_number" required></div>
+            <div class="form-group"><label class="required">Номер договора</label><input type="text" id="dogovor_number" required></div>
+            <div class="form-group"><label class="required">КБК (20 символов)</label><input type="text" id="kbk" required></div>
+            <div class="form-group"><label class="required">Сумма платежа</label><input type="number" step="0.01" id="payment_amount" required></div>
+            <div class="form-group"><label class="required">Дата платежа</label><input type="date" id="date_of_payment" required></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-danger" onclick="closeModal()">Отмена</button><button class="btn btn-primary" onclick="savePayment()">Сохранить</button></div>
+    </div>
+</div>
+
+<div id="viewModal" class="modal">
+    <div class="view-modal-content"><div class="modal-header"><span class="close" onclick="closeViewModal()">&times;</span><h2>Просмотр платежа</h2></div><div class="modal-body"><div id="viewContent"></div></div><div class="modal-footer"><button class="btn btn-primary" onclick="closeViewModal()">Закрыть</button></div></div>
+</div>
+
+<div id="docModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><span class="close" onclick="closeDocModal()">&times;</span><h2 id="docModalTitle">Добавить документ</h2></div>
+        <div class="modal-body">
+            <input type="hidden" id="docEditId">
+            <div class="form-group"><label class="required">Тип документа</label>
+                <select id="docType" required>
+                    <option value="">-- Выберите тип --</option>
+                    <option value="уведомление">Уведомление</option>
+                    <option value="претензия">Претензия</option>
+                </select>
+            </div>
+            <div id="dynamicDocFields"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-danger" onclick="closeDocModal()">Отмена</button><button class="btn btn-primary" onclick="saveDocument()">Сохранить</button></div>
+    </div>
+</div>
+
+<div id="viewDocModal" class="modal">
+    <div class="view-modal-content"><div class="modal-header"><span class="close" onclick="closeViewDocModal()">&times;</span><h2>Просмотр документа</h2></div><div class="modal-body"><div id="viewDocContent"></div></div><div class="modal-footer"><button class="btn btn-primary" onclick="closeViewDocModal()">Закрыть</button></div></div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Техническая поддержка</h3>
+            <ul>
+                <li><a href="mailto:bog.kateryna@yandex.ru">bog.kateryna@yandex.ru</a></li>
+                <li><a href="mailto:antonzhorov08@gmail.com">antonzhorov08@gmail.com</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Система ORiIO</h3>
+            <p>Управление договорами аренды</p>
+            <p style="margin-top: 15px; color: #a0aec0;">Версия 0.8.7 - Интерактивная таблица</p>
+        </div>
+        <div class="footer-section">
+            <h3>Быстрые ссылки</h3>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="Right_holders_table.html">Правообладатели</a></li>
+                <li><a href="Arend_dogovors_table.html">Договоры аренды</a></li>
+                <li><a href="Movable_property_table.html">Движимое имущество</a></li>
+                <li><a href="Immovable_property_table.html">Недвижимое имущество</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ========== НАВИГАЦИЯ ХЕДЕРА ==========
+    const homeBtn = document.getElementById('homeBtn');
+    const ownersBtn = document.getElementById('ownersBtn');
+    const arendBtn = document.getElementById('arendBtn');
+    const gratisBtn = document.getElementById('gratisBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const dropdownContainer = document.getElementById('propertyDropdown');
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const movableItem = document.querySelector('.dropdown-item[data-property="movable"]');
+    const immovableItem = document.querySelector('.dropdown-item[data-property="immovable"]');
+
+    if (homeBtn) homeBtn.addEventListener('click', () => window.location.href = 'index.html');
+    if (ownersBtn) ownersBtn.addEventListener('click', () => window.location.href = 'Right_holders_table.html');
+    if (arendBtn) arendBtn.addEventListener('click', () => window.location.href = 'Arend_dogovors_table.html');
+    if (gratisBtn) gratisBtn.addEventListener('click', () => window.location.href = 'Gratuitous_use_table.html');
+    if (loginBtn) loginBtn.addEventListener('click', () => window.location.href = 'Login.html');
+    if (movableItem) movableItem.addEventListener('click', () => window.location.href = 'Movable_property_table.html');
+    if (immovableItem) immovableItem.addEventListener('click', () => window.location.href = 'Immovable_property_table.html');
+
+    function toggleDropdown(forceState) {
+        const isActive = dropdownContainer.classList.contains('active');
+        if (forceState === true || (forceState === undefined && !isActive)) {
+            dropdownContainer.classList.add('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'true');
+        } else {
+            dropdownContainer.classList.remove('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        if (dropdownContainer && !dropdownContainer.contains(event.target) && dropdownContainer.classList.contains('active')) {
+            dropdownContainer.classList.remove('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // ========== ОСНОВНАЯ ЛОГИКА ДОГОВОРОВ (РЕДАКТИРОВАНИЕ / ПРОСМОТР) ==========
+    let contracts = [];
+
+    function loadContracts() {
+        const saved = localStorage.getItem('arendContracts');
+        if (saved) contracts = JSON.parse(saved);
+        else contracts = [];
+    }
+
+    function saveContracts() {
+        localStorage.setItem('arendContracts', JSON.stringify(contracts));
+    }
+
+    // Получение параметров из URL (?edit=ID или ?view=ID)
+    function getUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            editId: urlParams.get('edit') ? parseInt(urlParams.get('edit')) : null,
+            viewId: urlParams.get('view') ? parseInt(urlParams.get('view')) : null
+        };
+    }
+
+    // Заполнение формы данными договора
+    function fillFormWithContract(contract) {
+        if (!contract) return false;
+        document.getElementById('Dogovor_number').value = contract.dogovor_number || '';
+        document.getElementById('INN').value = contract.inn || '';
+        document.getElementById('ID_entities').value = contract.id_entities || '';
+        document.getElementById('Date_of_dogovor').value = contract.date_of_dogovor || '';
+        document.getElementById('Start_date').value = contract.start_date || '';
+        document.getElementById('End_date').value = contract.end_date || '';
+        document.getElementById('Fee').value = contract.fee || '';
+        document.getElementById('Property_transfer_date').value = contract.property_transfer_date || '';
+        return true;
+    }
+
+    // Установка режима "только просмотр"
+    function setReadonlyMode(isReadonly) {
+        const inputs = document.querySelectorAll('#contractForm input');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const backBtn = document.getElementById('backToTableBtn');
+        
+        inputs.forEach(input => {
+            if (input.type !== 'hidden') {
+                input.disabled = isReadonly;
+                if (isReadonly) input.classList.add('readonly-mode');
+                else input.classList.remove('readonly-mode');
+            }
+        });
+        
+        if (isReadonly) {
+            submitBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            if (backBtn) backBtn.style.display = 'inline-block';
+        } else {
+            submitBtn.style.display = 'inline-block';
+            if (backBtn) backBtn.style.display = 'none';
+            const { viewId } = getUrlParams();
+            if (!viewId) cancelBtn.style.display = 'inline-block';
+            else cancelBtn.style.display = 'none';
+        }
+    }
+
+    // Настройка заголовка и описания формы
+    function setupFormTitleAndDescription() {
+        const { editId, viewId } = getUrlParams();
+        const titleElem = document.getElementById('formTitle');
+        const descElem = document.getElementById('formDescription');
+        
+        if (viewId) {
+            if (titleElem) titleElem.textContent = 'Просмотр договора аренды';
+            if (descElem) descElem.textContent = 'Режим просмотра. Данные защищены от редактирования.';
+            setReadonlyMode(true);
+        } else if (editId) {
+            if (titleElem) titleElem.textContent = 'Редактирование договора аренды';
+            if (descElem) descElem.textContent = 'Внесите необходимые изменения в данные договора аренды. Поля, отмеченные звездочкой (*), обязательны для заполнения.';
+            setReadonlyMode(false);
+        } else {
+            if (titleElem) titleElem.textContent = 'Регистрация договора аренды';
+            if (descElem) descElem.textContent = 'Заполните форму ниже для регистрации нового договора аренды в системе. Все поля, отмеченные звездочкой (*), обязательны для заполнения.';
+            setReadonlyMode(false);
+        }
+    }
+
+    // Загрузка договора для редактирования или просмотра
+    function loadContractFromUrl() {
+        const { editId, viewId } = getUrlParams();
+        const contractId = editId || viewId;
+        
+        if (contractId) {
+            loadContracts();
+            const contract = contracts.find(c => c.id === contractId);
+            if (contract) {
+                fillFormWithContract(contract);
+                return true;
+            } else {
+                console.warn('Договор не найден, ID:', contractId);
+                alert('Договор не найден. Будет создан новый договор.');
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // Обработка отправки формы
+    function setupFormHandler() {
+        const form = document.getElementById('contractForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const { viewId } = getUrlParams();
+            if (viewId) {
+                alert('Режим просмотра. Редактирование недоступно.');
+                return;
+            }
+            
+            // Сбор данных
+            const dogovor_number = document.getElementById('Dogovor_number').value.trim();
+            const inn = document.getElementById('INN').value.trim();
+            const id_entities = parseInt(document.getElementById('ID_entities').value);
+            const date_of_dogovor = document.getElementById('Date_of_dogovor').value;
+            const start_date = document.getElementById('Start_date').value;
+            const end_date = document.getElementById('End_date').value;
+            const fee = parseFloat(document.getElementById('Fee').value);
+            const property_transfer_date = document.getElementById('Property_transfer_date').value;
+            
+            // Валидация
+            if (!dogovor_number || !inn || !id_entities || !date_of_dogovor || !start_date || !end_date || !fee) {
+                alert('Пожалуйста, заполните все обязательные поля!');
+                return;
+            }
+            if (!/^\d{10}$|^\d{12}$/.test(inn)) {
+                alert('ИНН должен содержать 10 или 12 цифр!');
+                return;
+            }
+            if (new Date(start_date) < new Date(date_of_dogovor)) {
+                alert('Дата начала договора не может быть раньше даты заключения!');
+                return;
+            }
+            if (new Date(end_date) <= new Date(start_date)) {
+                alert('Дата окончания договора должна быть позже даты начала!');
+                return;
+            }
+            
+            const { editId } = getUrlParams();
+            
+            loadContracts();
+            
+            if (editId) {
+                // Режим редактирования
+                const index = contracts.findIndex(c => c.id === editId);
+                if (index !== -1) {
+                    contracts[index] = {
+                        ...contracts[index],
+                        dogovor_number,
+                        inn,
+                        id_entities,
+                        date_of_dogovor,
+                        start_date,
+                        end_date,
+                        fee,
+                        property_transfer_date: property_transfer_date || ''
+                    };
+                    saveContracts();
+                    alert('Договор успешно обновлён!');
+                    window.location.href = 'Arend_dogovors_table.html';
+                } else {
+                    alert('Ошибка: договор не найден');
+                }
+            } else {
+                // Режим создания нового договора
+                const newId = contracts.length > 0 ? Math.max(...contracts.map(c => c.id)) + 1 : 1;
+                contracts.push({
+                    id: newId,
+                    dogovor_number,
+                    inn,
+                    id_entities,
+                    date_of_dogovor,
+                    start_date,
+                    end_date,
+                    fee,
+                    property_transfer_date: property_transfer_date || ''
+                });
+                saveContracts();
+                alert('Договор успешно добавлен!');
+                form.reset();
+                // Перенаправление на таблицу после добавления
+                window.location.href = 'Arend_dogovors_table.html';
+            }
+        });
+    }
+    
+    // Кнопка отмены (возврат на таблицу)
+    function setupCancelButton() {
+        const cancelBtn = document.getElementById('cancelBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                window.location.href = 'Arend_dogovors_table.html';
+            });
+        }
+        
+        const backBtn = document.getElementById('backToTableBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                window.location.href = 'Arend_dogovors_table.html';
+            });
+        }
+    }
+
+    // ========== ЛОГИКА ПЛАТЕЖЕЙ ==========
+    let payments = [];
+    function loadPayments() { const saved = localStorage.getItem('payments'); if(saved) payments = JSON.parse(saved); renderPaymentsTable(); }
+    function savePayments() { localStorage.setItem('payments', JSON.stringify(payments)); }
+    function formatDate(dateString) { if(!dateString) return '—'; return new Date(dateString).toLocaleDateString('ru-RU'); }
+    function formatMoney(amount) { return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 2 }).format(amount); }
+    function escapeHtml(t) { if(!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    
+    function renderPaymentsTable() {
+        const tbody = document.getElementById('tableBody');
+        if(!tbody) return;
+        if(payments.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px;">Нет данных. Нажмите "Добавить платеж"</td></tr>'; return; }
+        tbody.innerHTML = payments.map(p => `<tr><td><strong>${escapeHtml(p.payment_number)}</strong></td><td>${escapeHtml(p.dogovor_number)}</td><td>${p.kbk}</td><td>${formatMoney(p.payment_amount)}</td><td>${formatDate(p.date_of_payment)}</td><td><div class="action-buttons"><button class="view-btn" onclick="viewPayment(${p.id})">Просмотр</button><button class="edit-btn" onclick="openEditModal(${p.id})">Редакт.</button><button class="delete-btn" onclick="deletePayment(${p.id})">Удалить</button></div></td></tr>`).join('');
+    }
+    
+    function viewPayment(id) { const p = payments.find(p => p.id === id); if(p) document.getElementById('viewContent').innerHTML = `<div class="view-field"><strong>Номер платежа:</strong> <span>${escapeHtml(p.payment_number)}</span></div><div class="view-field"><strong>Номер договора:</strong> <span>${escapeHtml(p.dogovor_number)}</span></div><div class="view-field"><strong>КБК:</strong> <span>${p.kbk}</span></div><div class="view-field"><strong>Сумма:</strong> <span>${formatMoney(p.payment_amount)}</span></div><div class="view-field"><strong>Дата:</strong> <span>${formatDate(p.date_of_payment)}</span></div>`; document.getElementById('viewModal').style.display = 'block'; }
+    function openAddModal() { document.getElementById('modalTitle').textContent = 'Добавить платеж'; document.getElementById('editId').value = ''; document.getElementById('payment_number').value = ''; document.getElementById('dogovor_number').value = ''; document.getElementById('kbk').value = ''; document.getElementById('payment_amount').value = ''; document.getElementById('date_of_payment').value = ''; document.getElementById('modal').style.display = 'block'; }
+    function openEditModal(id) { const p = payments.find(p => p.id === id); if(p){ document.getElementById('modalTitle').textContent = 'Редактировать платеж'; document.getElementById('editId').value = p.id; document.getElementById('payment_number').value = p.payment_number; document.getElementById('dogovor_number').value = p.dogovor_number; document.getElementById('kbk').value = p.kbk; document.getElementById('payment_amount').value = p.payment_amount; document.getElementById('date_of_payment').value = p.date_of_payment; document.getElementById('modal').style.display = 'block'; } }
+    function savePayment() {
+        const id = document.getElementById('editId').value;
+        const payment_number = document.getElementById('payment_number').value.trim();
+        const dogovor_number = document.getElementById('dogovor_number').value.trim();
+        const kbk = document.getElementById('kbk').value.trim();
+        const payment_amount = parseFloat(document.getElementById('payment_amount').value);
+        const date_of_payment = document.getElementById('date_of_payment').value;
+        if(!payment_number || !dogovor_number || !kbk || !payment_amount || !date_of_payment) { alert('Заполните все поля!'); return; }
+        if(kbk.length !== 20) { alert('КБК должен содержать 20 символов'); return; }
+        if(payment_amount <= 0) { alert('Сумма платежа должна быть больше 0'); return; }
+        if(id) { const idx = payments.findIndex(p => p.id == id); if(idx !== -1) payments[idx] = { ...payments[idx], payment_number, dogovor_number, kbk, payment_amount, date_of_payment }; }
+        else { const newId = payments.length ? Math.max(...payments.map(p => p.id)) + 1 : 1; payments.push({ id: newId, payment_number, dogovor_number, kbk, payment_amount, date_of_payment }); }
+        savePayments(); renderPaymentsTable(); closeModal();
+    }
+    function deletePayment(id) { if(confirm('Удалить платеж?')) { payments = payments.filter(p => p.id !== id); savePayments(); renderPaymentsTable(); } }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+
+    // ========== ЛОГИКА ДОКУМЕНТОВ ==========
+    let documents = [];
+    function loadDocuments() { const saved = localStorage.getItem('documents_extended'); if(saved) documents = JSON.parse(saved); renderDocumentsTable(); }
+    function saveDocuments() { localStorage.setItem('documents_extended', JSON.stringify(documents)); }
+    
+    function renderDocumentsTable() {
+        const tbody = document.getElementById('docTableBody');
+        if(!tbody) return;
+        if(documents.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px;">Нет документов. Нажмите "Добавить документ"</td></tr>'; return; }
+        tbody.innerHTML = documents.map(doc => {
+            let details = '';
+            if(doc.type === 'уведомление') details = `Долг: ${formatMoney(doc.debt||0)}, Пеня: ${formatMoney(doc.penalty||0)}`;
+            else if(doc.type === 'претензия') details = `Недоплата: ${formatDate(doc.debtStart)} - ${formatDate(doc.debtEnd)}, Долг: ${formatMoney(doc.debt||0)}, Пеня: ${formatMoney(doc.penalty||0)}`;
+            return `<tr><td><strong>${doc.id}</strong></td><td>${escapeHtml(doc.type)}</td><td>${details}</td><td><div class="action-buttons"><button class="view-btn" onclick="viewDocument(${doc.id})">Просмотр</button><button class="edit-btn" onclick="openDocEditModal(${doc.id})">Редакт.</button><button class="delete-btn" onclick="deleteDocument(${doc.id})">Удалить</button></div></td></tr>`;
+        }).join('');
+    }
+    
+    function renderDynamicFields(type, existingData = {}) {
+        const container = document.getElementById('dynamicDocFields');
+        if(!container) return;
+        if(type === 'уведомление') {
+            container.innerHTML = `<div class="form-group"><label class="required">Задолженность по аренде (₽)</label><input type="number" step="0.01" id="debt" value="${existingData.debt || ''}" required></div><div class="form-group"><label class="required">Размер пени (₽)</label><input type="number" step="0.01" id="penalty" value="${existingData.penalty || ''}" required></div>`;
+        } else if(type === 'претензия') {
+            container.innerHTML = `<div class="form-group"><label class="required">Начало недоплаты</label><input type="date" id="debtStart" value="${existingData.debtStart || ''}" required></div><div class="form-group"><label class="required">Конец недоплаты</label><input type="date" id="debtEnd" value="${existingData.debtEnd || ''}" required></div><div class="form-group"><label class="required">Задолженность по аренде (₽)</label><input type="number" step="0.01" id="debt" value="${existingData.debt || ''}" required></div><div class="form-group"><label class="required">Начало начисления пени</label><input type="date" id="penaltyStart" value="${existingData.penaltyStart || ''}" required></div><div class="form-group"><label class="required">Конец начисления пени</label><input type="date" id="penaltyEnd" value="${existingData.penaltyEnd || ''}" required></div><div class="form-group"><label class="required">Размер пени (₽)</label><input type="number" step="0.01" id="penalty" value="${existingData.penalty || ''}" required></div>`;
+        } else container.innerHTML = '';
+    }
+    
+    function openDocAddModal() { document.getElementById('docModalTitle').textContent = 'Добавить документ'; document.getElementById('docEditId').value = ''; document.getElementById('docType').value = ''; renderDynamicFields('', {}); document.getElementById('docModal').style.display = 'block'; }
+    function openDocEditModal(id) { const doc = documents.find(d => d.id === id); if(doc){ document.getElementById('docModalTitle').textContent = 'Редактировать документ'; document.getElementById('docEditId').value = doc.id; document.getElementById('docType').value = doc.type; renderDynamicFields(doc.type, doc); document.getElementById('docModal').style.display = 'block'; } }
+    function collectDocData(type) {
+        if(type === 'уведомление') {
+            const debt = parseFloat(document.getElementById('debt')?.value);
+            const penalty = parseFloat(document.getElementById('penalty')?.value);
+            if(isNaN(debt) || isNaN(penalty)) throw new Error('Заполните поля суммы');
+            return { debt, penalty };
+        } else if(type === 'претензия') {
+            const debtStart = document.getElementById('debtStart')?.value;
+            const debtEnd = document.getElementById('debtEnd')?.value;
+            const debt = parseFloat(document.getElementById('debt')?.value);
+            const penaltyStart = document.getElementById('penaltyStart')?.value;
+            const penaltyEnd = document.getElementById('penaltyEnd')?.value;
+            const penalty = parseFloat(document.getElementById('penalty')?.value);
+            if(!debtStart || !debtEnd || isNaN(debt) || !penaltyStart || !penaltyEnd || isNaN(penalty)) throw new Error('Заполните все поля');
+            return { debtStart, debtEnd, debt, penaltyStart, penaltyEnd, penalty };
+        }
+        return {};
+    }
+    function saveDocument() {
+        const id = document.getElementById('docEditId').value;
+        const docType = document.getElementById('docType').value;
+        if(!docType) { alert('Выберите тип документа'); return; }
+        try {
+            const dynamicData = collectDocData(docType);
+            if(id) { const idx = documents.findIndex(d => d.id == id); if(idx !== -1) documents[idx] = { ...documents[idx], type: docType, ...dynamicData }; }
+            else { const newId = documents.length ? Math.max(...documents.map(d => d.id)) + 1 : 1; documents.push({ id: newId, type: docType, ...dynamicData }); }
+            saveDocuments(); renderDocumentsTable(); closeDocModal();
+        } catch(e) { alert(e.message); }
+    }
+    function deleteDocument(id) { if(confirm('Удалить документ?')) { documents = documents.filter(d => d.id !== id); saveDocuments(); renderDocumentsTable(); } }
+    function viewDocument(id) {
+        const doc = documents.find(d => d.id === id);
+        if(!doc) return;
+        let html = `<div class="view-field"><strong>ID:</strong> ${doc.id}</div><div class="view-field"><strong>Тип:</strong> ${escapeHtml(doc.type)}</div>`;
+        if(doc.type === 'уведомление') { html += `<div class="view-field"><strong>Задолженность по аренде:</strong> ${formatMoney(doc.debt||0)}</div><div class="view-field"><strong>Размер пени:</strong> ${formatMoney(doc.penalty||0)}</div>`; }
+        else if(doc.type === 'претензия') { html += `<div class="view-field"><strong>Начало недоплаты:</strong> ${formatDate(doc.debtStart)}</div><div class="view-field"><strong>Конец недоплаты:</strong> ${formatDate(doc.debtEnd)}</div><div class="view-field"><strong>Задолженность по аренде:</strong> ${formatMoney(doc.debt||0)}</div><div class="view-field"><strong>Начало начисления пени:</strong> ${formatDate(doc.penaltyStart)}</div><div class="view-field"><strong>Конец начисления пени:</strong> ${formatDate(doc.penaltyEnd)}</div><div class="view-field"><strong>Размер пени:</strong> ${formatMoney(doc.penalty||0)}</div>`; }
+        document.getElementById('viewDocContent').innerHTML = html; document.getElementById('viewDocModal').style.display = 'block';
+    }
+    function closeDocModal() { document.getElementById('docModal').style.display = 'none'; }
+    function closeViewDocModal() { document.getElementById('viewDocModal').style.display = 'none'; }
+    
+    document.getElementById('docType')?.addEventListener('change', (e) => renderDynamicFields(e.target.value, {}));
+    
+    window.onclick = function(event) {
+        if (event.target === document.getElementById('modal')) closeModal();
+        if (event.target === document.getElementById('viewModal')) closeViewModal();
+        if (event.target === document.getElementById('docModal')) closeDocModal();
+        if (event.target === document.getElementById('viewDocModal')) closeViewDocModal();
+    }
+    
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    loadContracts();
+    loadContractFromUrl();
+    setupFormTitleAndDescription();
+    setupFormHandler();
+    setupCancelButton();
+    loadPayments();
+    loadDocuments();
+</script>
+</body>
+</html>

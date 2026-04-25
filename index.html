@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Главная страница | ORiIO System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Хедер — строгая линия */
+        .main-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Навигационный ряд: все кнопки центрируются */
+        .nav-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            row-gap: 0.85rem;
+            flex: 1;
+        }
+
+        /* Бренд — выравнивание по центру по вертикали */
+        .brand {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            white-space: nowrap;
+            border-right: 1px solid #cbd5e1;
+            padding-right: 1rem;
+            margin-right: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            height: 52px;
+        }
+
+        /* Единый базовый стиль для ВСЕХ кнопок */
+        .nav-btn, .dropdown-btn, .login-btn, .dropdown-item {
+            background-color: #667eea;
+            border: none;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-family: inherit;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0px;
+            width: 160px;
+            min-width: 160px;
+            max-width: 160px;
+            height: 52px;
+            padding: 0.5rem 0.6rem;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Кнопки внутри выпадающего списка */
+        .dropdown-item {
+            width: 100%;
+            min-width: 160px;
+            text-align: left;
+            justify-content: flex-start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: normal;
+            word-break: break-word;
+            height: 52px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Эффекты наведения */
+        .nav-btn:hover, .dropdown-btn:hover, .login-btn:hover, .dropdown-item:hover {
+            background-color: #5a6fd6;
+        }
+
+        .nav-btn:active, .dropdown-btn:active, .login-btn:active, .dropdown-item:active {
+            background-color: #4d62c2;
+        }
+
+        /* Контейнер выпадающего списка */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Стрелка для дропдауна */
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            display: inline-block;
+            margin-left: 8px;
+            font-family: monospace;
+        }
+
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Выпадающее меню */
+        .dropdown-content {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            width: 100%;
+            border-radius: 0px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, visibility 0.2s, transform 0.2s;
+            z-index: 50;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .dropdown.active .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Main Content - увеличенный отступ сверху на 50px */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 50px auto 40px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Welcome Container */
+        .container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcome-wrapper {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .welcome-header {
+            background-color: #667eea;
+            color: white;
+            padding: 40px 30px;
+            border-bottom: 2px solid #5a67d8;
+        }
+
+        .welcome-header h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-header p {
+            color: #e2e8f0;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+
+        .welcome-body {
+            padding: 50px 40px;
+        }
+
+        .welcome-content h2 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-content p {
+            color: #4a5568;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background-color: #f7fafc;
+            border: 2px solid #cbd5e0;
+            padding: 25px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        .login-button {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-button:hover {
+            background-color: #4a65df;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2d3748;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 50px;
+            border-top: 2px solid #4a5568;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #cbd5e0;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1300px) {
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 155px;
+                min-width: 155px;
+                max-width: 155px;
+                font-size: 0.82rem;
+                height: 52px;
+            }
+            .dropdown-item {
+                min-width: 155px;
+                height: 52px;
+            }
+            .dropdown-content {
+                min-width: 155px;
+            }
+            .brand {
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 155px;
+            }
+        }
+
+        @media (max-width: 1150px) {
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 150px;
+                min-width: 150px;
+                max-width: 150px;
+                font-size: 0.8rem;
+            }
+            .dropdown-item {
+                min-width: 150px;
+            }
+            .dropdown-content {
+                min-width: 150px;
+            }
+            .brand {
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 150px;
+            }
+        }
+
+        @media (max-width: 1050px) {
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 145px;
+                min-width: 145px;
+                max-width: 145px;
+                font-size: 0.78rem;
+                height: 52px;
+            }
+            .dropdown-item {
+                min-width: 145px;
+                height: 52px;
+                font-size: 0.78rem;
+            }
+            .brand {
+                font-size: 1rem;
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 145px;
+            }
+        }
+
+        @media (max-width: 950px) {
+            .header-container {
+                padding: 0.85rem 1.2rem;
+            }
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 140px;
+                min-width: 140px;
+                max-width: 140px;
+                font-size: 0.75rem;
+                height: 52px;
+            }
+            .dropdown-item {
+                min-width: 140px;
+                height: 52px;
+                font-size: 0.75rem;
+            }
+            .brand {
+                font-size: 0.9rem;
+                padding-right: 0.75rem;
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 140px;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 135px;
+                min-width: 135px;
+                max-width: 135px;
+                font-size: 0.73rem;
+                height: 52px;
+            }
+            .dropdown-item {
+                min-width: 135px;
+                height: 52px;
+            }
+            .brand {
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 135px;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .nav-btn, .dropdown-btn, .login-btn {
+                width: 130px;
+                min-width: 130px;
+                max-width: 130px;
+                font-size: 0.7rem;
+                height: 52px;
+                padding: 0.4rem 0.4rem;
+            }
+            .dropdown-item {
+                min-width: 130px;
+                font-size: 0.7rem;
+                height: 52px;
+            }
+            .brand {
+                height: 52px;
+            }
+            .dropdown .dropdown-btn {
+                width: 130px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin: 50px 20px 40px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .welcome-header h1 {
+                font-size: 24px;
+            }
+            .welcome-header p {
+                font-size: 16px;
+            }
+            .welcome-content h2 {
+                font-size: 22px;
+            }
+            .welcome-content p {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                margin: 50px 15px 30px;
+            }
+            .welcome-header {
+                padding: 25px 20px;
+            }
+            .welcome-header h1 {
+                font-size: 20px;
+            }
+            .welcome-body {
+                padding: 30px 20px;
+            }
+            .login-button {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-container">
+        <div class="nav-row">
+            <div class="brand">ORiIO</div>
+
+            <button class="nav-btn" id="homeBtn">Главная</button>
+            <button class="nav-btn" id="ownersBtn">Правообладатели</button>
+            <button class="nav-btn" id="arendBtn">Договоры аренды</button>
+            <button class="nav-btn" id="gratisBtn">Безвозмездное пользование</button>
+
+            <div class="dropdown" id="propertyDropdown">
+                <button class="dropdown-btn" id="dropdownToggle" aria-haspopup="true" aria-expanded="false">
+                    Имущество <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-content" role="menu">
+                    <button class="dropdown-item" data-property="movable">Движимое</button>
+                    <button class="dropdown-item" data-property="immovable">Недвижимое</button>
+                </div>
+            </div>
+
+            <button class="login-btn" id="loginBtn">Вход</button>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <div class="welcome-wrapper">
+            <div class="welcome-header">
+                <h1>Добро пожаловать в ORiIO System!</h1>
+                <p>Система управления имуществом для Комитета по управлению имуществом г. Волгодонска</p>
+            </div>
+            
+            <div class="welcome-body">
+                <div class="welcome-content">
+                    <h2>Начните работу с системой</h2>
+                    <p>Данный сайт предназначен для Комитета по управлению имуществом г. Волгодонска. Для продолжения работы необходимо войти в аккаунт.</p>
+                    <p>Система ORiIO предоставляет комплексное решение для управления правообладателями, договорами аренды, платежами и всем имуществом города.</p>
+                    
+                    <a href="Login.html" class="login-button">Войти в систему</a>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <h3>Управление правообладателями</h3>
+                            <p>Регистрация и ведение реестра всех правообладателей города</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Юридические лица</h3>
+                            <p>Ведение базы данных юридических лиц и их представителей</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Договоры аренды</h3>
+                            <p>Управление договорами аренды муниципального имущества</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Платежи и документы</h3>
+                            <p>Контроль платежей и формирование финансовой отчетности</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Недвижимое имущество</h3>
+                            <p>Учет и управление недвижимым имуществом города</p>
+                        </div>
+                        <div class="feature-card">
+                            <h3>Движимое имущество</h3>
+                            <p>Регистрация и контроль движимого муниципального имущества</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Техническая поддержка</h3>
+            <ul>
+                <li><a href="mailto:bog.kateryna@yandex.ru">bog.kateryna@yandex.ru</a></li>
+                <li><a href="mailto:antonzhorov08@gmail.com">antonzhorov08@gmail.com</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Система ORiIO</h3>
+            <p>Управление договорами аренды</p>
+            <p style="margin-top: 15px; color: #a0aec0;">Версия 0.8.7 - Интерактивная таблица</p>
+        </div>
+        <div class="footer-section">
+            <h3>Быстрые ссылки</h3>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="Right_holders_table.html">Правообладатели</a></li>
+                <li><a href="Arend_dogovors_table.html">Договоры аренды</a></li>
+                <li><a href="Movable_property_table.html">Движимое имущество</a></li>
+                <li><a href="Immovable_property_table.html">Недвижимое имущество</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Получаем все интерактивные элементы
+    const homeBtn = document.getElementById('homeBtn');
+    const ownersBtn = document.getElementById('ownersBtn');
+    const arendBtn = document.getElementById('arendBtn');
+    const gratisBtn = document.getElementById('gratisBtn');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // Элементы выпадающего списка
+    const dropdownContainer = document.getElementById('propertyDropdown');
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const movableItem = document.querySelector('.dropdown-item[data-property="movable"]');
+    const immovableItem = document.querySelector('.dropdown-item[data-property="immovable"]');
+
+    // Навигация по кнопкам
+    if (homeBtn) homeBtn.addEventListener('click', () => window.location.href = 'index.html');
+    if (ownersBtn) ownersBtn.addEventListener('click', () => window.location.href = 'Right_holders_table.html');
+    if (arendBtn) arendBtn.addEventListener('click', () => window.location.href = 'Arend_dogovors_table.html');
+    if (gratisBtn) gratisBtn.addEventListener('click', () => window.location.href = 'Gratuitous_use_table.html');
+    if (loginBtn) loginBtn.addEventListener('click', () => window.location.href = 'Login.html');
+    if (movableItem) movableItem.addEventListener('click', () => window.location.href = 'Movable_property_table.html');
+    if (immovableItem) immovableItem.addEventListener('click', () => window.location.href = 'Immovable_property_table.html');
+
+    // ----- Логика выпадающего списка -----
+    function toggleDropdown(forceState) {
+        const isActive = dropdownContainer.classList.contains('active');
+        if (forceState === true || (forceState === undefined && !isActive)) {
+            dropdownContainer.classList.add('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'true');
+        } else {
+            dropdownContainer.classList.remove('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+
+    // Закрытие при клике вне области
+    document.addEventListener('click', (event) => {
+        if (dropdownContainer && !dropdownContainer.contains(event.target)) {
+            if (dropdownContainer.classList.contains('active')) {
+                dropdownContainer.classList.remove('active');
+                if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+
+    // Предотвращаем закрытие при клике на содержимое меню
+    const dropdownContent = document.querySelector('.dropdown-content');
+    if (dropdownContent) {
+        dropdownContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    // Функция для синхронизации ширины элементов дропдауна с кнопкой-триггером
+    function syncDropdownWidth() {
+        const dropdownBtnElem = document.querySelector('.dropdown-btn');
+        if (dropdownBtnElem) {
+            const btnWidth = window.getComputedStyle(dropdownBtnElem).width;
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const dropdownContentElem = document.querySelector('.dropdown-content');
+            if (dropdownContentElem) {
+                dropdownContentElem.style.minWidth = btnWidth;
+                dropdownContentElem.style.width = btnWidth;
+            }
+            dropdownItems.forEach(item => {
+                item.style.width = btnWidth;
+                item.style.minWidth = btnWidth;
+            });
+        }
+    }
+
+    // Выравниваем высоту всех кнопок и бренда для идеального центрирования по вертикали
+    function syncHeights() {
+        const allButtons = document.querySelectorAll('.nav-btn, .dropdown-btn, .login-btn');
+        const brand = document.querySelector('.brand');
+        let maxHeight = 52; // базовая высота
+        
+        allButtons.forEach(btn => {
+            const h = btn.offsetHeight;
+            if (h > maxHeight) maxHeight = h;
+        });
+        
+        if (maxHeight > 0) {
+            allButtons.forEach(btn => {
+                btn.style.height = maxHeight + 'px';
+            });
+            if (brand) {
+                brand.style.height = maxHeight + 'px';
+                brand.style.display = 'inline-flex';
+                brand.style.alignItems = 'center';
+            }
+        }
+    }
+
+    // Запускаем синхронизацию после загрузки и при изменении размера окна
+    window.addEventListener('DOMContentLoaded', () => {
+        syncDropdownWidth();
+        syncHeights();
+    });
+    
+    window.addEventListener('resize', () => {
+        syncDropdownWidth();
+        syncHeights();
+    });
+</script>
+</body>
+</html>

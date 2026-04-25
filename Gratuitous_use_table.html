@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Безвозмездное пользование | ORiIO System - Управление таблицей</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Хедер — строгая линия */
+        .main-header {
+            background-color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            row-gap: 0.85rem;
+            flex: 1;
+        }
+
+        .brand {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            white-space: nowrap;
+            border-right: 1px solid #cbd5e1;
+            padding-right: 1rem;
+            margin-right: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            height: 52px;
+        }
+
+        .nav-btn, .dropdown-btn, .login-btn, .dropdown-item {
+            background-color: #667eea;
+            border: none;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-family: inherit;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0px;
+            width: 160px;
+            min-width: 160px;
+            max-width: 160px;
+            height: 52px;
+            padding: 0.5rem 0.6rem;
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .dropdown-item {
+            width: 100%;
+            min-width: 160px;
+            text-align: left;
+            justify-content: flex-start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: normal;
+            word-break: break-word;
+            height: 52px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-btn:hover, .dropdown-btn:hover, .login-btn:hover, .dropdown-item:hover {
+            background-color: #5a6fd6;
+        }
+
+        .nav-btn:active, .dropdown-btn:active, .login-btn:active, .dropdown-item:active {
+            background-color: #4d62c2;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-arrow {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            display: inline-block;
+            margin-left: 8px;
+            font-family: monospace;
+        }
+
+        .dropdown.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: calc(100% + 2px);
+            left: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            width: 100%;
+            border-radius: 0px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, visibility 0.2s, transform 0.2s;
+            z-index: 50;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .dropdown.active .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown .dropdown-btn {
+            width: 160px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1400px;
+            margin: 50px auto 40px;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* Табличная часть */
+        .table-container {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            background-color: #667eea;
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 2px solid #5a67d8;
+        }
+
+        .table-header h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .table-header p {
+            color: #e2e8f0;
+        }
+
+        .button-group {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        /* Измененный цвет .btn-primary */
+        .btn-primary {
+            background-color: #4a5caa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4555a5;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .btn-warning {
+            background-color: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #dd6b20;
+        }
+
+        .btn-info {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #3182ce;
+        }
+
+        .contract-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .contract-table th {
+            background-color: #edf2f7;
+            color: #2d3748;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #cbd5e0;
+        }
+
+        .contract-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .contract-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Увеличенные кнопки действий в таблице с разными цветами */
+        .view-btn {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-width: 90px;
+        }
+        .view-btn:hover {
+            background-color: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        .edit-btn {
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-width: 90px;
+        }
+        .edit-btn:hover {
+            background-color: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            min-width: 90px;
+        }
+        .delete-btn:hover {
+            background-color: #c53030;
+            transform: translateY(-1px);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s;
+        }
+
+        .view-modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background-color: #667eea;
+            color: white;
+            padding: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .view-field {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .view-field strong {
+            display: inline-block;
+            width: 200px;
+            color: #2d3748;
+        }
+
+        .view-field span {
+            color: #4a5568;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e53e3e;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #cbd5e0;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .close:hover {
+            color: #e2e8f0;
+        }
+
+        footer {
+            background-color: #2d3748;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 0;
+            border-top: 2px solid #4a5568;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Адаптивность */
+       @media (max-width: 768px) {
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
+            .contract-table th, .contract-table td { padding: 10px; font-size: 12px; }
+            .action-buttons { flex-direction: column; align-items: stretch; }
+            .view-btn, .edit-btn, .delete-btn { width: 100%; text-align: center; }
+        }
+
+        @media (max-width: 1300px) { .nav-btn, .dropdown-btn, .login-btn { width: 155px; min-width: 155px; } }
+        @media (max-width: 1150px) { .nav-btn, .dropdown-btn, .login-btn { width: 150px; min-width: 150px; } }
+        @media (max-width: 1050px) { .nav-btn, .dropdown-btn, .login-btn { width: 145px; min-width: 145px; } }
+        @media (max-width: 950px)  { .nav-btn, .dropdown-btn, .login-btn { width: 140px; min-width: 140px; } }
+        @media (max-width: 850px)  { .nav-btn, .dropdown-btn, .login-btn { width: 135px; min-width: 135px; } }
+        @media (max-width: 780px)  { .nav-btn, .dropdown-btn, .login-btn { width: 130px; min-width: 130px; } }
+        
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-container">
+        <div class="nav-row">
+            <div class="brand">ORiIO</div>
+            <button class="nav-btn" id="homeBtn">Главная</button>
+            <button class="nav-btn" id="ownersBtn">Правообладатели</button>
+            <button class="nav-btn" id="arendBtn">Договоры аренды</button>
+            <button class="nav-btn" id="gratisBtn">Безвозмездное пользование</button>
+            <div class="dropdown" id="propertyDropdown">
+                <button class="dropdown-btn" id="dropdownToggle" aria-haspopup="true" aria-expanded="false">
+                    Имущество <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-content" role="menu">
+                    <button class="dropdown-item" data-property="movable">Движимое</button>
+                    <button class="dropdown-item" data-property="immovable">Недвижимое</button>
+                </div>
+            </div>
+            <button class="login-btn" id="loginBtn">Вход</button>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="table-container">
+        <div class="table-header">
+            <h1>Управление договорами безвозмездного пользования</h1>
+            <p>Добавляйте, редактируйте, просматривайте и удаляйте записи. Все данные сохраняются автоматически.</p>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="openAddModal()">+ Добавить договор</button>
+            </div>
+        </div>
+        
+        <table class="contract-table">
+            <thead>
+                <tr>
+                    <th>№ договора</th>
+                    <th>ИНН компании</th>
+                    <th>ID юр.лица</th>
+                    <th>Дата заключения</th>
+                    <th>Дата передачи имущества</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Данные будут загружены из localStorage -->
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Модальное окно для добавления/редактирования -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Добавить договор безвозмездного пользования</h2>
+        </div>
+        <div class="modal-body">
+            <form id="contractForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="dogovor_number" class="required">Номер договора</label>
+                    <input type="text" id="dogovor_number" placeholder="Введите номер договора" required>
+                </div>
+                <div class="form-group">
+                    <label for="inn" class="required">ИНН компании</label>
+                    <input type="text" id="inn" placeholder="10 или 12 цифр" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_entities" class="required">ID юридического лица</label>
+                    <input type="number" id="id_entities" placeholder="Введите ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="date_of_dogovor" class="required">Дата заключения договора</label>
+                    <input type="date" id="date_of_dogovor" required>
+                </div>
+                <div class="form-group">
+                    <label for="property_transfer_date">Дата передачи имущества</label>
+                    <input type="date" id="property_transfer_date">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" onclick="closeModal()">Отмена</button>
+            <button class="btn btn-primary" onclick="saveContract()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра -->
+<div id="viewModal" class="modal">
+    <div class="view-modal-content">
+        <div class="modal-header">
+            <span class="close" onclick="closeViewModal()">&times;</span>
+            <h2>Просмотр договора безвозмездного пользования</h2>
+        </div>
+        <div class="modal-body">
+            <div id="viewContent"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="closeViewModal()">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Техническая поддержка</h3>
+            <ul>
+                <li><a href="mailto:bog.kateryna@yandex.ru">bog.kateryna@yandex.ru</a></li>
+                <li><a href="mailto:antonzhorov08@gmail.com">antonzhorov08@gmail.com</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Система ORiIO</h3>
+            <p>Управление договорами аренды</p>
+            <p style="margin-top: 15px; color: #a0aec0;">Версия 0.8.7 - Интерактивная таблица</p>
+        </div>
+        <div class="footer-section">
+            <h3>Быстрые ссылки</h3>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="Right_holders_table.html">Правообладатели</a></li>
+                <li><a href="Arend_dogovors_table.html">Договоры аренды</a></li>
+                <li><a href="Movable_property_table.html">Движимое имущество</a></li>
+                <li><a href="Immovable_property_table.html">Недвижимое имущество</a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Навигация хедера
+    const homeBtn = document.getElementById('homeBtn');
+    const ownersBtn = document.getElementById('ownersBtn');
+    const arendBtn = document.getElementById('arendBtn');
+    const gratisBtn = document.getElementById('gratisBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const dropdownContainer = document.getElementById('propertyDropdown');
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const movableItem = document.querySelector('.dropdown-item[data-property="movable"]');
+    const immovableItem = document.querySelector('.dropdown-item[data-property="immovable"]');
+
+    if (homeBtn) homeBtn.addEventListener('click', () => window.location.href = 'index.html');
+    if (ownersBtn) ownersBtn.addEventListener('click', () => window.location.href = 'Right_holders_table.html');
+    if (arendBtn) arendBtn.addEventListener('click', () => window.location.href = 'Arend_dogovors_table.html');
+    if (gratisBtn) gratisBtn.addEventListener('click', () => window.location.href = 'Gratuitous_use_table.html');
+    if (loginBtn) loginBtn.addEventListener('click', () => window.location.href = 'Login.html');
+    if (movableItem) movableItem.addEventListener('click', () => window.location.href = 'Movable_property_table.html');
+    if (immovableItem) immovableItem.addEventListener('click', () => window.location.href = 'Immovable_property_table.html');
+
+    function toggleDropdown(forceState) {
+        const isActive = dropdownContainer.classList.contains('active');
+        if (forceState === true || (forceState === undefined && !isActive)) {
+            dropdownContainer.classList.add('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'true');
+        } else {
+            dropdownContainer.classList.remove('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    if (dropdownToggle) {
+        dropdownToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        if (dropdownContainer && !dropdownContainer.contains(event.target) && dropdownContainer.classList.contains('active')) {
+            dropdownContainer.classList.remove('active');
+            if (dropdownToggle) dropdownToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    const dropdownContent = document.querySelector('.dropdown-content');
+    if (dropdownContent) dropdownContent.addEventListener('click', (e) => e.stopPropagation());
+
+    function syncDropdownWidth() {
+        const dropdownBtnElem = document.querySelector('.dropdown-btn');
+        if (dropdownBtnElem) {
+            const btnWidth = window.getComputedStyle(dropdownBtnElem).width;
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const dropdownContentElem = document.querySelector('.dropdown-content');
+            if (dropdownContentElem) {
+                dropdownContentElem.style.minWidth = btnWidth;
+                dropdownContentElem.style.width = btnWidth;
+            }
+            dropdownItems.forEach(item => {
+                item.style.width = btnWidth;
+                item.style.minWidth = btnWidth;
+            });
+        }
+    }
+
+    function syncHeights() {
+        const allButtons = document.querySelectorAll('.nav-btn, .dropdown-btn, .login-btn');
+        const brand = document.querySelector('.brand');
+        let maxHeight = 52;
+        allButtons.forEach(btn => { if (btn.offsetHeight > maxHeight) maxHeight = btn.offsetHeight; });
+        if (maxHeight > 0) {
+            allButtons.forEach(btn => btn.style.height = maxHeight + 'px');
+            if (brand) {
+                brand.style.height = maxHeight + 'px';
+                brand.style.display = 'inline-flex';
+                brand.style.alignItems = 'center';
+            }
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { syncDropdownWidth(); syncHeights(); });
+    window.addEventListener('resize', () => { syncDropdownWidth(); syncHeights(); });
+
+    // ===== ОСНОВНАЯ ЛОГИКА ТАБЛИЦЫ =====
+    let contracts = [];
+
+    function loadData() {
+        const saved = localStorage.getItem('gratuitousContracts');
+        if (saved) contracts = JSON.parse(saved);
+        renderTable();
+    }
+
+    function saveData() {
+        localStorage.setItem('gratuitousContracts', JSON.stringify(contracts));
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '—';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU');
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        if (!tbody) return;
+        if (contracts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">Нет данных. Нажмите "Добавить договор" для создания записи.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = contracts.map(contract => `
+            <tr>
+                <td><strong>${escapeHtml(contract.dogovor_number)}</strong></td>
+                <td>${contract.inn}</td>
+                <td>${contract.id_entities}</td>
+                <td>${formatDate(contract.date_of_dogovor)}</strong></td>
+                <td>${formatDate(contract.property_transfer_date)}</strong></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="view-btn" onclick="viewContract(${contract.id})">Просмотр</button>
+                        <button class="edit-btn" onclick="openEditModal(${contract.id})">Редакт.</button>
+                        <button class="delete-btn" onclick="deleteContract(${contract.id})">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function viewContract(id) {
+        const contract = contracts.find(c => c.id === id);
+        if (!contract) return;
+        const viewContent = document.getElementById('viewContent');
+        viewContent.innerHTML = `
+            <div class="view-field"><strong>Номер договора:</strong> <span>${escapeHtml(contract.dogovor_number)}</span></div>
+            <div class="view-field"><strong>ИНН компании:</strong> <span>${contract.inn}</span></div>
+            <div class="view-field"><strong>ID юридического лица:</strong> <span>${contract.id_entities}</span></div>
+            <div class="view-field"><strong>Дата заключения договора:</strong> <span>${formatDate(contract.date_of_dogovor)}</span></div>
+            <div class="view-field"><strong>Дата передачи имущества:</strong> <span>${formatDate(contract.property_transfer_date)}</span></div>
+        `;
+        document.getElementById('viewModal').style.display = 'block';
+    }
+
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'Добавить договор безвозмездного пользования';
+        document.getElementById('editId').value = '';
+        document.getElementById('dogovor_number').value = '';
+        document.getElementById('inn').value = '';
+        document.getElementById('id_entities').value = '';
+        document.getElementById('date_of_dogovor').value = '';
+        document.getElementById('property_transfer_date').value = '';
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function openEditModal(id) {
+        const contract = contracts.find(c => c.id === id);
+        if (!contract) return;
+        document.getElementById('modalTitle').textContent = 'Редактировать договор безвозмездного пользования';
+        document.getElementById('editId').value = contract.id;
+        document.getElementById('dogovor_number').value = contract.dogovor_number;
+        document.getElementById('inn').value = contract.inn;
+        document.getElementById('id_entities').value = contract.id_entities;
+        document.getElementById('date_of_dogovor').value = contract.date_of_dogovor;
+        document.getElementById('property_transfer_date').value = contract.property_transfer_date || '';
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function saveContract() {
+        const id = document.getElementById('editId').value;
+        const dogovor_number = document.getElementById('dogovor_number').value.trim();
+        const inn = document.getElementById('inn').value.trim();
+        const id_entities = document.getElementById('id_entities').value.trim();
+        const date_of_dogovor = document.getElementById('date_of_dogovor').value;
+        const property_transfer_date = document.getElementById('property_transfer_date').value;
+        
+        if (!dogovor_number || !inn || !id_entities || !date_of_dogovor) {
+            alert('Пожалуйста, заполните все обязательные поля!');
+            return;
+        }
+        if (!/^\d{10}$|^\d{12}$/.test(inn)) {
+            alert('ИНН должен содержать 10 или 12 цифр!');
+            return;
+        }
+        
+        if (id) {
+            const index = contracts.findIndex(c => c.id == id);
+            if (index !== -1) {
+                contracts[index] = { 
+                    ...contracts[index], 
+                    dogovor_number, inn, id_entities: parseInt(id_entities), 
+                    date_of_dogovor, property_transfer_date: property_transfer_date || '' 
+                };
+            }
+        } else {
+            const newId = contracts.length > 0 ? Math.max(...contracts.map(c => c.id)) + 1 : 1;
+            contracts.push({ 
+                id: newId, dogovor_number, inn, id_entities: parseInt(id_entities), 
+                date_of_dogovor, property_transfer_date: property_transfer_date || '' 
+            });
+        }
+        saveData();
+        renderTable();
+        closeModal();
+    }
+
+    function deleteContract(id) {
+        if (confirm('Вы уверены, что хотите удалить этот договор безвозмездного пользования?')) {
+            contracts = contracts.filter(c => c.id !== id);
+            saveData();
+            renderTable();
+        }
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+    function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+
+    window.onclick = function(event) {
+        if (event.target === document.getElementById('modal')) closeModal();
+        if (event.target === document.getElementById('viewModal')) closeViewModal();
+    }
+
+    loadData();
+</script>
+</body>
+</html>
