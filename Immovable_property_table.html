@@ -207,7 +207,6 @@
             transition: all 0.2s;
         }
 
-        /* Измененный цвет .btn-primary */
         .btn-primary {
             background-color: #4a5caa;
             color: white;
@@ -257,7 +256,6 @@
             flex-wrap: wrap;
         }
 
-        /* Увеличенные кнопки действий в таблице с разными цветами */
         .view-btn {
             background-color: #4299e1;
             color: white;
@@ -359,10 +357,23 @@
             background-color: #667eea;
             color: white;
             padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
         .modal-header h2 {
             font-size: 20px;
+            margin: 0;
+        }
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #e2e8f0;
         }
 
         .modal-body {
@@ -423,18 +434,6 @@
             border-color: #667eea;
         }
 
-        .close {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-        }
-
-        .close:hover {
-            color: #e2e8f0;
-        }
-
         footer {
             background-color: #2d3748;
             color: white;
@@ -478,21 +477,14 @@
             text-decoration: underline;
         }
 
-        /* Адаптивность */
-       @media (max-width: 768px) {
-            .footer-content { grid-template-columns: 1fr; gap: 30px; }
-            .contract-table th, .contract-table td { padding: 10px; font-size: 12px; }
+        @media (max-width: 768px) {
+            .footer-content { grid-template-columns: 1fr; gap: 30px; text-align: center; }
+            .property-table th, .property-table td { padding: 10px; font-size: 12px; }
             .action-buttons { flex-direction: column; align-items: stretch; }
             .view-btn, .edit-btn, .delete-btn { width: 100%; text-align: center; }
+            .modal-content, .view-modal-content { width: 95%; margin: 30px auto; }
+            .view-field strong { width: 140px; }
         }
-
-        @media (max-width: 1300px) { .nav-btn, .dropdown-btn, .login-btn { width: 155px; min-width: 155px; } }
-        @media (max-width: 1150px) { .nav-btn, .dropdown-btn, .login-btn { width: 150px; min-width: 150px; } }
-        @media (max-width: 1050px) { .nav-btn, .dropdown-btn, .login-btn { width: 145px; min-width: 145px; } }
-        @media (max-width: 950px)  { .nav-btn, .dropdown-btn, .login-btn { width: 140px; min-width: 140px; } }
-        @media (max-width: 850px)  { .nav-btn, .dropdown-btn, .login-btn { width: 135px; min-width: 135px; } }
-        @media (max-width: 780px)  { .nav-btn, .dropdown-btn, .login-btn { width: 130px; min-width: 130px; } }
-
     </style>
 </head>
 <body>
@@ -541,9 +533,7 @@
                     <th>Действия</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- Данные будут загружены из localStorage -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </main>
@@ -552,8 +542,8 @@
 <div id="modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span class="close" onclick="closeModal()">&times;</span>
             <h2 id="modalTitle">Добавить объект недвижимости</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
             <form id="propertyForm">
@@ -564,7 +554,7 @@
                 </div>
                 <div class="form-group">
                     <label for="cadastral_number">Кадастровый номер</label>
-                    <input type="text" id="cadastral_number" placeholder="Введите кадастровый номер">
+                    <input type="text" id="cadastral_number" placeholder="XX:XX:XXXXXX:XXX" maxlength="25">
                 </div>
                 <div class="form-group">
                     <label for="type" class="required">Тип имущества</label>
@@ -611,8 +601,8 @@
 <div id="viewModal" class="modal">
     <div class="view-modal-content">
         <div class="modal-header">
-            <span class="close" onclick="closeViewModal()">&times;</span>
             <h2>Просмотр объекта недвижимости</h2>
+            <span class="close" onclick="closeViewModal()">&times;</span>
         </div>
         <div class="modal-body">
             <div id="viewContent"></div>
@@ -651,7 +641,48 @@
 </footer>
 
 <script>
-    // Навигация хедера
+    // ==================== МАСКА ДЛЯ КАДАСТРОВОГО НОМЕРА ====================
+    // Формат: XX:XX:XXXXXX:XXX  (цифры, разделители : вставляются автоматически)
+    function setupCadastralMask(inputElement) {
+        if (!inputElement) return;
+        
+        inputElement.addEventListener('input', function(e) {
+            let value = this.value.replace(/[^0-9]/g, ''); // только цифры
+            let formatted = '';
+            
+            // Максимум 15 цифр (2+2+6+3 = 13-15 цифр)
+            if (value.length > 0) {
+                // Группа 1: 2 цифры
+                formatted = value.substring(0, 2);
+                if (value.length >= 2) {
+                    formatted += ':';
+                    // Группа 2: 2 цифры
+                    formatted += value.substring(2, 4);
+                    if (value.length >= 4) {
+                        formatted += ':';
+                        // Группа 3: 6 цифр
+                        formatted += value.substring(4, 10);
+                        if (value.length >= 10) {
+                            formatted += ':';
+                            // Группа 4: до 3 цифр
+                            formatted += value.substring(10, 13);
+                        }
+                    }
+                }
+            }
+            this.value = formatted;
+        });
+        
+        // Блокировка ввода нецифровых символов на лету
+        inputElement.addEventListener('keydown', function(e) {
+            const key = e.key;
+            if (key === ' ' || key === 'Space' || key === 'e' || key === 'E' || key === '-' || key === '+' || (key === ':' && !e.ctrlKey && !e.metaKey)) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // ==================== НАВИГАЦИЯ ХЕДЕРА ====================
     const homeBtn = document.getElementById('homeBtn');
     const ownersBtn = document.getElementById('ownersBtn');
     const arendBtn = document.getElementById('arendBtn');
@@ -695,18 +726,18 @@
         }
     });
 
-    const dropdownContent = document.querySelector('.dropdown-content');
-    if (dropdownContent) dropdownContent.addEventListener('click', (e) => e.stopPropagation());
+    const dropdownContentElem = document.querySelector('.dropdown-content');
+    if (dropdownContentElem) dropdownContentElem.addEventListener('click', (e) => e.stopPropagation());
 
     function syncDropdownWidth() {
         const dropdownBtnElem = document.querySelector('.dropdown-btn');
         if (dropdownBtnElem) {
             const btnWidth = window.getComputedStyle(dropdownBtnElem).width;
             const dropdownItems = document.querySelectorAll('.dropdown-item');
-            const dropdownContentElem = document.querySelector('.dropdown-content');
-            if (dropdownContentElem) {
-                dropdownContentElem.style.minWidth = btnWidth;
-                dropdownContentElem.style.width = btnWidth;
+            const dropdownContentElemLocal = document.querySelector('.dropdown-content');
+            if (dropdownContentElemLocal) {
+                dropdownContentElemLocal.style.minWidth = btnWidth;
+                dropdownContentElemLocal.style.width = btnWidth;
             }
             dropdownItems.forEach(item => {
                 item.style.width = btnWidth;
@@ -774,7 +805,7 @@
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
         if (properties.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">Нет данных. Нажмите "Добавить объект" для создания записи.nda</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">Нет данных. Нажмите "Добавить объект" для создания записи.</td></tr>';
             return;
         }
         tbody.innerHTML = properties.map(property => `
@@ -785,18 +816,12 @@
                 <td>${escapeHtml(property.full_name)}</strong></td>
                 <td>${escapeHtml(formatAddress(property))}</strong></td>
                 <td>${formatArea(property.area_sq_m)}</strong></td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="view-btn" onclick="viewProperty(${property.id})">Просмотр</button>
-                        <button class="edit-btn" onclick="openEditModal(${property.id})">Ред.</button>
-                        <button class="delete-btn" onclick="deleteProperty(${property.id})">Удалить</button>
-                    </div>
-                </td>
+                <td><div class="action-buttons"><button class="view-btn" onclick="viewProperty(${property.id})">Просмотр</button><button class="edit-btn" onclick="openEditModal(${property.id})">Ред.</button><button class="delete-btn" onclick="deleteProperty(${property.id})">Удалить</button></div></td>
             </tr>
         `).join('');
     }
 
-    function viewProperty(id) {
+    window.viewProperty = function(id) {
         const property = properties.find(p => p.id === id);
         if (!property) return;
         const viewContent = document.getElementById('viewContent');
@@ -813,9 +838,9 @@
             <div class="view-field"><strong>Дополнительная информация:</strong> <span>${property.additional_info ? escapeHtml(property.additional_info) : '—'}</span></div>
         `;
         document.getElementById('viewModal').style.display = 'block';
-    }
+    };
 
-    function openAddModal() {
+    window.openAddModal = function() {
         document.getElementById('modalTitle').textContent = 'Добавить объект недвижимости';
         document.getElementById('editId').value = '';
         document.getElementById('registry_number').value = '';
@@ -829,9 +854,12 @@
         document.getElementById('area_sq_m').value = '';
         document.getElementById('additional_info').value = '';
         document.getElementById('modal').style.display = 'block';
-    }
+        // Применяем маску к полю кадастрового номера
+        const cadastralField = document.getElementById('cadastral_number');
+        if (cadastralField) setupCadastralMask(cadastralField);
+    };
 
-    function openEditModal(id) {
+    window.openEditModal = function(id) {
         const property = properties.find(p => p.id === id);
         if (!property) return;
         document.getElementById('modalTitle').textContent = 'Редактировать объект недвижимости';
@@ -847,12 +875,14 @@
         document.getElementById('area_sq_m').value = property.area_sq_m || '';
         document.getElementById('additional_info').value = property.additional_info || '';
         document.getElementById('modal').style.display = 'block';
-    }
+        const cadastralField = document.getElementById('cadastral_number');
+        if (cadastralField) setupCadastralMask(cadastralField);
+    };
 
-    function saveProperty() {
+    window.saveProperty = function() {
         const id = document.getElementById('editId').value;
         const registry_number = document.getElementById('registry_number').value.trim();
-        const cadastral_number = document.getElementById('cadastral_number').value.trim();
+        let cadastral_number = document.getElementById('cadastral_number').value.trim();
         const type = document.getElementById('type').value.trim();
         const registry_date = document.getElementById('registry_date').value;
         const full_name = document.getElementById('full_name').value.trim();
@@ -867,13 +897,29 @@
             return;
         }
         
+        // Валидация кадастрового номера (если заполнен) - должна быть маска с разделителями
+        if (cadastral_number) {
+            const cadPattern = /^\d{2}:\d{2}:\d{6}:\d{1,3}$/;
+            if (!cadPattern.test(cadastral_number)) {
+                if (!confirm('Кадастровый номер должен быть в формате XX:XX:XXXXXX:XXX. Продолжить сохранение?')) {
+                    return;
+                }
+            }
+        }
+        
         if (id) {
             const index = properties.findIndex(p => p.id == id);
             if (index !== -1) {
                 properties[index] = { 
                     ...properties[index], 
-                    registry_number, cadastral_number: cadastral_number || null, type, registry_date, 
-                    full_name, street, building, facility: facility || null,
+                    registry_number, 
+                    cadastral_number: cadastral_number || null, 
+                    type, 
+                    registry_date, 
+                    full_name, 
+                    street, 
+                    building, 
+                    facility: facility || null,
                     area_sq_m: area_sq_m ? parseFloat(area_sq_m) : null,
                     additional_info: additional_info || null
                 };
@@ -881,8 +927,15 @@
         } else {
             const newId = properties.length > 0 ? Math.max(...properties.map(p => p.id)) + 1 : 1;
             properties.push({ 
-                id: newId, registry_number, cadastral_number: cadastral_number || null, type, registry_date, 
-                full_name, street, building, facility: facility || null,
+                id: newId, 
+                registry_number, 
+                cadastral_number: cadastral_number || null, 
+                type, 
+                registry_date, 
+                full_name, 
+                street, 
+                building, 
+                facility: facility || null,
                 area_sq_m: area_sq_m ? parseFloat(area_sq_m) : null,
                 additional_info: additional_info || null
             });
@@ -890,15 +943,15 @@
         saveData();
         renderTable();
         closeModal();
-    }
+    };
 
-    function deleteProperty(id) {
+    window.deleteProperty = function(id) {
         if (confirm('Вы уверены, что хотите удалить этот объект недвижимости?')) {
             properties = properties.filter(p => p.id !== id);
             saveData();
             renderTable();
         }
-    }
+    };
 
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
@@ -908,7 +961,10 @@
         if (event.target === document.getElementById('viewModal')) closeViewModal();
     }
 
+    // Инициализация: загружаем данные и применяем маску к полю при загрузке страницы (если модалка открыта)
     loadData();
+    const initialCadastralField = document.getElementById('cadastral_number');
+    if (initialCadastralField) setupCadastralMask(initialCadastralField);
 </script>
 </body>
 </html>

@@ -299,7 +299,6 @@
             background-color: #38a169;
         }
 
-        /* Табличная часть */
         .table-container {
             background-color: white;
             border: 2px solid #e2e8f0;
@@ -436,7 +435,6 @@
             transform: translateY(-1px);
         }
 
-        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -489,10 +487,14 @@
             background-color: #667eea;
             color: white;
             padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .modal-header h2 {
             font-size: 20px;
+            margin: 0;
         }
 
         .modal-body {
@@ -524,11 +526,11 @@
         }
 
         .close {
-            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
             color: white;
+            line-height: 1;
         }
 
         .close:hover {
@@ -579,13 +581,13 @@
         }
 
         @media (max-width: 768px) {
-                    .form-grid { grid-template-columns: 1fr; gap: 15px; }
-                    .form-body { padding: 20px; }
-                    .view-field strong { width: 140px; }
-                    .action-buttons { flex-direction: column; align-items: stretch; }
-                    .view-btn, .edit-btn, .delete-btn { width: 100%; text-align: center; }
-                }
-
+            .form-grid { grid-template-columns: 1fr; gap: 15px; }
+            .form-body { padding: 20px; }
+            .view-field strong { width: 140px; }
+            .action-buttons { flex-direction: column; align-items: stretch; }
+            .view-btn, .edit-btn, .delete-btn { width: 100%; text-align: center; }
+            .modal-content, .view-modal-content { width: 95%; margin: 30px auto; }
+        }
     </style>
 </head>
 <body>
@@ -623,11 +625,11 @@
                 <form class="form-grid" id="rightHolderForm">
                     <div class="form-group">
                         <label for="INN" class="required">ИНН компании</label>
-                        <input id="INN" name="INN" type="text" placeholder="10 или 12 цифр" required>
+                        <input id="INN" name="INN" type="text" placeholder="10 или 12 цифр" maxlength="12" inputmode="numeric" required>
                     </div>
                     <div class="form-group">
                         <label for="OGRN" class="required">ОГРН компании</label>
-                        <input id="OGRN" name="OGRN" type="text" placeholder="13 цифр" required>
+                        <input id="OGRN" name="OGRN" type="text" placeholder="13 цифр" maxlength="13" inputmode="numeric" required>
                     </div>
                     <div class="form-group">
                         <label for="Full_name" class="required">Наименование компании</label>
@@ -642,7 +644,7 @@
                     </div>
                     <div class="form-group">
                         <label for="KPP">КПП компании</label>
-                        <input id="KPP" name="KPP" type="text" placeholder="9 цифр">
+                        <input id="KPP" name="KPP" type="text" placeholder="9 цифр" maxlength="9" inputmode="numeric">
                     </div>
                     <div class="form-group">
                         <label for="Region" class="required">Регион регистрации</label>
@@ -674,7 +676,6 @@
         </div>
     </div>
 
-    <!-- Таблица юридических лиц -->
     <div class="table-container">
         <div class="table-header">
             <h1>Управление юридическими лицами</h1>
@@ -696,14 +697,11 @@
                     <th>Действия</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- Данные будут загружены из localStorage -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </main>
 
-<!-- Модальное окно для добавления/редактирования юридического лица -->
 <div id="modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -719,7 +717,7 @@
                 </div>
                 <div class="form-group">
                     <label for="inn" class="required">ИНН компании</label>
-                    <input type="text" id="inn" placeholder="10 или 12 цифр" required>
+                    <input type="text" id="inn" placeholder="10 или 12 цифр" maxlength="12" inputmode="numeric" required>
                 </div>
                 <div class="form-group">
                     <label for="last_name" class="required">Фамилия представителя</label>
@@ -746,7 +744,6 @@
     </div>
 </div>
 
-<!-- Модальное окно для просмотра юридического лица -->
 <div id="viewModal" class="modal">
     <div class="view-modal-content">
         <div class="modal-header">
@@ -790,6 +787,37 @@
 </footer>
 
 <script>
+    // ========== МАСКИ ВВОДА ДЛЯ ПОЛЕЙ (только цифры, ограничение длины) ==========
+    function setupMask(inputElement, maxLength) {
+        if (!inputElement) return;
+        inputElement.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, maxLength);
+        });
+        inputElement.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Space' || e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // Основная форма
+    const innMain = document.getElementById('INN');
+    const ogrnMain = document.getElementById('OGRN');
+    const kppMain = document.getElementById('KPP');
+    setupMask(innMain, 12);
+    setupMask(ogrnMain, 13);
+    setupMask(kppMain, 9);
+    
+    // Модальное окно (юридические лица)
+    const innModal = document.getElementById('inn');
+    if (innModal) setupMask(innModal, 12);
+    
+    // Функция для динамического применения маски после открытия модального окна
+    function applyMaskToModalFields() {
+        const innField = document.getElementById('inn');
+        if (innField) setupMask(innField, 12);
+    }
+    
     // ========== НАВИГАЦИЯ ХЕДЕРА ==========
     const homeBtn = document.getElementById('homeBtn');
     const ownersBtn = document.getElementById('ownersBtn');
@@ -885,7 +913,6 @@
         localStorage.setItem('rightHolders', JSON.stringify(rightHolders));
     }
 
-    // Получение параметров из URL (?edit=ID или ?view=ID)
     function getUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
         return {
@@ -894,7 +921,6 @@
         };
     }
 
-    // Заполнение формы данными правообладателя
     function fillFormWithRightHolder(holder) {
         if (!holder) return false;
         document.getElementById('INN').value = holder.inn || '';
@@ -910,7 +936,6 @@
         return true;
     }
 
-    // Установка режима "только просмотр"
     function setReadonlyMode(isReadonly) {
         const inputs = document.querySelectorAll('#rightHolderForm input, #rightHolderForm select');
         const submitBtn = document.getElementById('submitBtn');
@@ -936,7 +961,6 @@
         }
     }
 
-    // Настройка заголовка и описания формы
     function setupFormTitleAndDescription() {
         const { editId, viewId } = getUrlParams();
         const titleElem = document.getElementById('formTitle');
@@ -948,60 +972,54 @@
             setReadonlyMode(true);
         } else if (editId) {
             if (titleElem) titleElem.textContent = 'Редактирование правообладателя';
-            if (descElem) descElem.textContent = 'Внесите необходимые изменения в данные правообладателя. Поля, отмеченные звездочкой (*), обязательны для заполнения.';
+            if (descElem) descElem.textContent = 'Внесите необходимые изменения в данные правообладателя.';
             setReadonlyMode(false);
         } else {
             if (titleElem) titleElem.textContent = 'Регистрация правообладателя';
-            if (descElem) descElem.textContent = 'Заполните форму ниже для регистрации нового правообладателя в системе. Все поля, отмеченные звездочкой (*), обязательны для заполнения.';
+            if (descElem) descElem.textContent = 'Заполните форму ниже для регистрации нового правообладателя.';
             setReadonlyMode(false);
         }
     }
 
-    // Загрузка правообладателя для редактирования или просмотра
     function loadRightHolderFromUrl() {
         const { editId, viewId } = getUrlParams();
         const holderId = editId || viewId;
-        
         if (holderId) {
             loadRightHolders();
             const holder = rightHolders.find(h => h.id === holderId);
             if (holder) {
                 fillFormWithRightHolder(holder);
                 return true;
-            } else {
-                console.warn('Правообладатель не найден, ID:', holderId);
-                alert('Правообладатель не найден. Будет создан новый.');
-                return false;
             }
         }
         return false;
     }
 
-    // Обработка отправки формы
     function setupFormHandler() {
         const form = document.getElementById('rightHolderForm');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const { viewId } = getUrlParams();
             if (viewId) {
                 alert('Режим просмотра. Редактирование недоступно.');
                 return;
             }
             
-            // Сбор данных
-            const inn = document.getElementById('INN').value.trim();
-            const ogrn = document.getElementById('OGRN').value.trim();
+            let inn = document.getElementById('INN').value.trim();
+            let ogrn = document.getElementById('OGRN').value.trim();
             const full_name = document.getElementById('Full_name').value.trim();
             const status = document.getElementById('Status').value;
-            const kpp = document.getElementById('KPP').value.trim();
+            let kpp = document.getElementById('KPP').value.trim();
             const region = document.getElementById('Region').value.trim();
             const city = document.getElementById('City').value.trim();
             const street = document.getElementById('Street').value.trim();
             const building = document.getElementById('Building').value.trim();
             const facility = document.getElementById('Facility').value.trim();
             
-            // Валидация
+            inn = inn.replace(/[^0-9]/g, '');
+            ogrn = ogrn.replace(/[^0-9]/g, '');
+            if (kpp) kpp = kpp.replace(/[^0-9]/g, '');
+            
             if (!inn || !ogrn || !full_name || !status || !region || !city || !street || !building) {
                 alert('Пожалуйста, заполните все обязательные поля!');
                 return;
@@ -1020,25 +1038,15 @@
             }
             
             const { editId } = getUrlParams();
-            
             loadRightHolders();
             
             if (editId) {
-                // Режим редактирования
                 const index = rightHolders.findIndex(h => h.id === editId);
                 if (index !== -1) {
                     rightHolders[index] = {
                         ...rightHolders[index],
-                        inn,
-                        ogrn,
-                        full_name,
-                        status,
-                        kpp: kpp || null,
-                        region,
-                        city,
-                        street,
-                        building,
-                        facility: facility || null
+                        inn, ogrn, full_name, status, kpp: kpp || null,
+                        region, city, street, building, facility: facility || null
                     };
                     saveRightHolders();
                     alert('Правообладатель успешно обновлён!');
@@ -1047,44 +1055,23 @@
                     alert('Ошибка: правообладатель не найден');
                 }
             } else {
-                // Режим создания нового правообладателя
                 const newId = rightHolders.length > 0 ? Math.max(...rightHolders.map(h => h.id)) + 1 : 1;
                 rightHolders.push({
-                    id: newId,
-                    inn,
-                    ogrn,
-                    full_name,
-                    status,
-                    kpp: kpp || null,
-                    region,
-                    city,
-                    street,
-                    building,
-                    facility: facility || null
+                    id: newId, inn, ogrn, full_name, status, kpp: kpp || null,
+                    region, city, street, building, facility: facility || null
                 });
                 saveRightHolders();
                 alert('Правообладатель успешно добавлен!');
-                form.reset();
                 window.location.href = 'Right_holders_table.html';
             }
         });
     }
     
-    // Кнопка отмены (возврат на таблицу)
     function setupCancelButton() {
         const cancelBtn = document.getElementById('cancelBtn');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                window.location.href = 'Right_holders_table.html';
-            });
-        }
-        
+        if (cancelBtn) cancelBtn.addEventListener('click', () => window.location.href = 'Right_holders_table.html');
         const backBtn = document.getElementById('backToTableBtn');
-        if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                window.location.href = 'Right_holders_table.html';
-            });
-        }
+        if (backBtn) backBtn.addEventListener('click', () => window.location.href = 'Right_holders_table.html');
     }
 
     // ========== ЛОГИКА ТАБЛИЦЫ ЮРИДИЧЕСКИХ ЛИЦ ==========
@@ -1118,22 +1105,16 @@
             <tr>
                 <td>${entity.id_entities}</strong></td>
                 <td>${entity.inn}</strong></td>
-                <td><strong>${escapeHtml(entity.last_name)}</strong></td>
+                <td>${escapeHtml(entity.last_name)}</strong></td>
                 <td>${escapeHtml(entity.first_name)}</strong></td>
                 <td>${escapeHtml(entity.otchestvo)}</strong></td>
                 <td>${entity.position ? escapeHtml(entity.position) : '<span style="color: #a0aec0;">—</span>'}</strong></td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="view-btn" onclick="viewLegalEntity(${entity.id})">Просмотр</button>
-                        <button class="edit-btn" onclick="openEditModal(${entity.id})">Ред.</button>
-                        <button class="delete-btn" onclick="deleteLegalEntity(${entity.id})">Удалить</button>
-                    </div>
-                </td>
+                <td><div class="action-buttons"><button class="view-btn" onclick="viewLegalEntity(${entity.id})">Просмотр</button><button class="edit-btn" onclick="openEditModal(${entity.id})">Ред.</button><button class="delete-btn" onclick="deleteLegalEntity(${entity.id})">Удалить</button></div></td>
             </tr>
         `).join('');
     }
 
-    function viewLegalEntity(id) {
+    window.viewLegalEntity = function(id) {
         const entity = legalEntities.find(e => e.id === id);
         if (!entity) return;
         const viewContent = document.getElementById('viewContent');
@@ -1146,9 +1127,9 @@
             <div class="view-field"><strong>Должность представителя:</strong> <span>${entity.position ? escapeHtml(entity.position) : '—'}</span></div>
         `;
         document.getElementById('viewModal').style.display = 'block';
-    }
+    };
 
-    function openAddModal() {
+    window.openAddModal = function() {
         document.getElementById('modalTitle').textContent = 'Добавить юридическое лицо';
         document.getElementById('editId').value = '';
         document.getElementById('id_entities').value = '';
@@ -1158,9 +1139,10 @@
         document.getElementById('otchestvo').value = '';
         document.getElementById('position').value = '';
         document.getElementById('modal').style.display = 'block';
-    }
+        applyMaskToModalFields();
+    };
 
-    function openEditModal(id) {
+    window.openEditModal = function(id) {
         const entity = legalEntities.find(e => e.id === id);
         if (!entity) return;
         document.getElementById('modalTitle').textContent = 'Редактировать юридическое лицо';
@@ -1172,16 +1154,19 @@
         document.getElementById('otchestvo').value = entity.otchestvo;
         document.getElementById('position').value = entity.position || '';
         document.getElementById('modal').style.display = 'block';
-    }
+        applyMaskToModalFields();
+    };
 
-    function saveLegalEntity() {
+    window.saveLegalEntity = function() {
         const id = document.getElementById('editId').value;
-        const id_entities = document.getElementById('id_entities').value.trim();
-        const inn = document.getElementById('inn').value.trim();
+        let id_entities = document.getElementById('id_entities').value.trim();
+        let inn = document.getElementById('inn').value.trim();
         const last_name = document.getElementById('last_name').value.trim();
         const first_name = document.getElementById('first_name').value.trim();
         const otchestvo = document.getElementById('otchestvo').value.trim();
         const position = document.getElementById('position').value.trim();
+        
+        inn = inn.replace(/[^0-9]/g, '');
         
         if (!id_entities || !inn || !last_name || !first_name || !otchestvo) {
             alert('Пожалуйста, заполните все обязательные поля!');
@@ -1218,25 +1203,25 @@
         saveLegalEntities();
         renderLegalTable();
         closeModal();
-    }
+    };
 
-    function deleteLegalEntity(id) {
+    window.deleteLegalEntity = function(id) {
         if (confirm('Вы уверены, что хотите удалить это юридическое лицо?')) {
             legalEntities = legalEntities.filter(e => e.id !== id);
             saveLegalEntities();
             renderLegalTable();
         }
-    }
+    };
 
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
-    function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+    window.closeModal = function() { document.getElementById('modal').style.display = 'none'; };
+    window.closeViewModal = function() { document.getElementById('viewModal').style.display = 'none'; };
 
     window.onclick = function(event) {
         if (event.target === document.getElementById('modal')) closeModal();
         if (event.target === document.getElementById('viewModal')) closeViewModal();
-    }
+    };
 
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    // Инициализация
     loadRightHolders();
     loadRightHolderFromUrl();
     setupFormTitleAndDescription();

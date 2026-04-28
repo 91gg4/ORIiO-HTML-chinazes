@@ -544,7 +544,7 @@
         </div>
         <table class="contract-table">
             <thead>
-                <tr><th>ID</th><th>Тип документа</th><th>№ договора аренды</th><th>Дата составления</th><th>Рег. номер имущества</th><th>Детали</th><th>Действия</th></tr>
+                <tr><th>ID</th><th>Тип документа</th><th>№ договора аренды</th><th>Дата составления</th><th>Рег. номер имущества</th><th>Детали</th><th>Действия</th></table>
             </thead>
             <tbody id="documentsTableBody"></tbody>
         </table>
@@ -562,7 +562,7 @@
             <form id="contractForm">
                 <input type="hidden" id="editId">
                 <div class="form-group"><label for="dogovor_number" class="required">Номер договора</label><input type="text" id="dogovor_number" placeholder="Введите номер договора" required></div>
-                <div class="form-group"><label for="inn" class="required">ИНН компании</label><input type="text" id="inn" placeholder="10 или 12 цифр" required></div>
+                <div class="form-group"><label for="inn" class="required">ИНН компании</label><input type="text" id="inn" maxlength="12" placeholder="10 или 12 цифр" required></div>
                 <div class="form-group"><label for="id_entities" class="required">ID юридического лица</label><input type="number" id="id_entities" placeholder="Введите ID" required></div>
                 <div class="form-group"><label for="date_of_dogovor" class="required">Дата заключения договора</label><input type="date" id="date_of_dogovor" required></div>
                 <div class="form-group"><label for="property_transfer_date">Дата передачи имущества</label><input type="date" id="property_transfer_date"></div>
@@ -630,6 +630,19 @@
 </footer>
 
 <script>
+    // ==================== МАСКА ДЛЯ ИНН (только цифры, не более 12) ====================
+    function setupInnMask(inputElement) {
+        if (!inputElement) return;
+        inputElement.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 12);
+        });
+        inputElement.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Space' || e.key === 'e' || e.key === 'E' || e.key === '-' || e.key === '+' || e.key === '.') {
+                e.preventDefault();
+            }
+        });
+    }
+    
     // ==================== НАВИГАЦИЯ ====================
     const homeBtn = document.getElementById('homeBtn');
     const ownersBtn = document.getElementById('ownersBtn');
@@ -664,12 +677,56 @@
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
         if (contracts.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">Нет данных. Нажмите "Добавить договор" для создания записи.</td></tr>'; return; }
-        tbody.innerHTML = contracts.map(c => `<tr><td><strong>${escapeHtml(c.dogovor_number)}</strong></td><td>${c.inn}</td><td>${c.id_entities}</td><td>${formatDate(c.date_of_dogovor)}</td><td>${formatDate(c.property_transfer_date)}</td><td><div class="action-buttons"><button class="view-btn" onclick="viewContract(${c.id})">Просмотр</button><button class="edit-btn" onclick="openEditModal(${c.id})">Ред.</button><button class="delete-btn" onclick="deleteContract(${c.id})">Удалить</button></div></td></tr>`).join('');
+        tbody.innerHTML = contracts.map(c => `<tr><td><strong>${escapeHtml(c.dogovor_number)}</strong></td><td>${c.inn}</td><td>${c.id_entities}</td><td>${formatDate(c.date_of_dogovor)}</td><td>${formatDate(c.property_transfer_date)}</td><td><div class="action-buttons"><button class="view-btn" onclick="viewContract(${c.id})">Просмотр</button><button class="edit-btn" onclick="openEditModal(${c.id})">Ред.</button><button class="delete-btn" onclick="deleteContract(${c.id})">Удалить</button></div></td>`).join('');
     }
     window.viewContract = function(id) { const c = contracts.find(c => c.id === id); if (!c) return; document.getElementById('viewContent').innerHTML = `<div class="view-field"><strong>Номер договора:</strong> <span>${escapeHtml(c.dogovor_number)}</span></div><div class="view-field"><strong>ИНН компании:</strong> <span>${c.inn}</span></div><div class="view-field"><strong>ID юридического лица:</strong> <span>${c.id_entities}</span></div><div class="view-field"><strong>Дата заключения договора:</strong> <span>${formatDate(c.date_of_dogovor)}</span></div><div class="view-field"><strong>Дата передачи имущества:</strong> <span>${formatDate(c.property_transfer_date)}</span></div>`; document.getElementById('viewModal').style.display = 'block'; };
-    window.openAddModal = function() { document.getElementById('modalTitle').innerText = 'Добавить договор безвозмездного пользования'; document.getElementById('editId').value = ''; document.getElementById('dogovor_number').value = ''; document.getElementById('inn').value = ''; document.getElementById('id_entities').value = ''; document.getElementById('date_of_dogovor').value = ''; document.getElementById('property_transfer_date').value = ''; document.getElementById('modal').style.display = 'block'; };
-    window.openEditModal = function(id) { const c = contracts.find(c => c.id === id); if (!c) return; document.getElementById('modalTitle').innerText = 'Редактировать договор безвозмездного пользования'; document.getElementById('editId').value = c.id; document.getElementById('dogovor_number').value = c.dogovor_number; document.getElementById('inn').value = c.inn; document.getElementById('id_entities').value = c.id_entities; document.getElementById('date_of_dogovor').value = c.date_of_dogovor; document.getElementById('property_transfer_date').value = c.property_transfer_date || ''; document.getElementById('modal').style.display = 'block'; };
-    window.saveContract = function() { const id = document.getElementById('editId').value; const dog = document.getElementById('dogovor_number').value.trim(); const inn = document.getElementById('inn').value.trim(); const idEnt = document.getElementById('id_entities').value.trim(); const dateDog = document.getElementById('date_of_dogovor').value; const propDate = document.getElementById('property_transfer_date').value; if (!dog || !inn || !idEnt || !dateDog) { alert('Заполните все обязательные поля'); return; } if (!/^\d{10}$|^\d{12}$/.test(inn)) { alert('ИНН должен содержать 10 или 12 цифр'); return; } if (id) { const idx = contracts.findIndex(c => c.id == id); if (idx !== -1) contracts[idx] = { ...contracts[idx], dogovor_number: dog, inn, id_entities: parseInt(idEnt), date_of_dogovor: dateDog, property_transfer_date: propDate || '' }; } else { const newId = contracts.length > 0 ? Math.max(...contracts.map(c => c.id)) + 1 : 1; contracts.push({ id: newId, dogovor_number: dog, inn, id_entities: parseInt(idEnt), date_of_dogovor: dateDog, property_transfer_date: propDate || '' }); } saveData(); renderTable(); closeModal(); };
+    window.openAddModal = function() { 
+        document.getElementById('modalTitle').innerText = 'Добавить договор безвозмездного пользования'; 
+        document.getElementById('editId').value = ''; 
+        document.getElementById('dogovor_number').value = ''; 
+        document.getElementById('inn').value = ''; 
+        document.getElementById('id_entities').value = ''; 
+        document.getElementById('date_of_dogovor').value = ''; 
+        document.getElementById('property_transfer_date').value = ''; 
+        document.getElementById('modal').style.display = 'block';
+        const innField = document.getElementById('inn');
+        if (innField) setupInnMask(innField);
+    };
+    window.openEditModal = function(id) { 
+        const c = contracts.find(c => c.id === id); 
+        if (!c) return; 
+        document.getElementById('modalTitle').innerText = 'Редактировать договор безвозмездного пользования'; 
+        document.getElementById('editId').value = c.id; 
+        document.getElementById('dogovor_number').value = c.dogovor_number; 
+        document.getElementById('inn').value = c.inn; 
+        document.getElementById('id_entities').value = c.id_entities; 
+        document.getElementById('date_of_dogovor').value = c.date_of_dogovor; 
+        document.getElementById('property_transfer_date').value = c.property_transfer_date || ''; 
+        document.getElementById('modal').style.display = 'block';
+        const innField = document.getElementById('inn');
+        if (innField) setupInnMask(innField);
+    };
+    window.saveContract = function() { 
+        const id = document.getElementById('editId').value; 
+        let dog = document.getElementById('dogovor_number').value.trim(); 
+        let inn = document.getElementById('inn').value.trim(); 
+        const idEnt = document.getElementById('id_entities').value.trim(); 
+        const dateDog = document.getElementById('date_of_dogovor').value; 
+        const propDate = document.getElementById('property_transfer_date').value; 
+        if (!dog || !inn || !idEnt || !dateDog) { alert('Заполните все обязательные поля'); return; } 
+        inn = inn.replace(/[^0-9]/g, '');
+        if (!/^\d{10}$|^\d{12}$/.test(inn)) { alert('ИНН должен содержать 10 или 12 цифр'); return; } 
+        if (id) { 
+            const idx = contracts.findIndex(c => c.id == id); 
+            if (idx !== -1) contracts[idx] = { ...contracts[idx], dogovor_number: dog, inn, id_entities: parseInt(idEnt), date_of_dogovor: dateDog, property_transfer_date: propDate || '' }; 
+        } else { 
+            const newId = contracts.length > 0 ? Math.max(...contracts.map(c => c.id)) + 1 : 1; 
+            contracts.push({ id: newId, dogovor_number: dog, inn, id_entities: parseInt(idEnt), date_of_dogovor: dateDog, property_transfer_date: propDate || '' }); 
+        } 
+        saveData(); 
+        renderTable(); 
+        closeModal(); 
+    };
     window.deleteContract = function(id) { if (confirm('Удалить договор?')) { contracts = contracts.filter(c => c.id !== id); saveData(); renderTable(); } };
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
     function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
@@ -684,7 +741,7 @@
         if (documents.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">Нет документов. Нажмите "Добавить документ"</td></tr>'; return; }
         tbody.innerHTML = documents.map(d => {
             let details = d.type === 'уведомление' ? `Долг: ${new Intl.NumberFormat('ru-RU', {style:'currency',currency:'RUB'}).format(d.debt||0)}, Пеня: ${new Intl.NumberFormat('ru-RU', {style:'currency',currency:'RUB'}).format(d.penalty||0)}` : `Период: ${formatDate(d.debtStart)} - ${formatDate(d.debtEnd)}, Долг: ${new Intl.NumberFormat('ru-RU', {style:'currency',currency:'RUB'}).format(d.debt||0)}, Пеня: ${new Intl.NumberFormat('ru-RU', {style:'currency',currency:'RUB'}).format(d.penalty||0)}`;
-            return `<tr><td>${d.id}</td><td>${escapeHtml(d.type)}</td><td>${escapeHtml(d.contractNumber)}</td><td>${formatDate(d.issueDate)}</td><td>${escapeHtml(d.propertyRegNumber)}</td><td>${details}</td><td class="action-buttons"><button class="view-btn" onclick="viewDocument(${d.id})">Просмотр</button><button class="edit-btn" onclick="openEditDocument(${d.id})">Ред.</button><button class="delete-btn" onclick="deleteDocument(${d.id})">Удалить</button></td></tr>`;
+            return `<tr><td>${d.id}</td><td>${escapeHtml(d.type)}</td><td>${escapeHtml(d.contractNumber)}</td><td>${formatDate(d.issueDate)}</td><td>${escapeHtml(d.propertyRegNumber)}</td><td>${details}</td><td class="action-buttons"><button class="view-btn" onclick="viewDocument(${d.id})">Просмотр</button><button class="edit-btn" onclick="openEditDocument(${d.id})">Ред.</button><button class="delete-btn" onclick="deleteDocument(${d.id})">Удалить</button></td>`;
         }).join('');
     }
     function renderDynamicDocFields(type, data = {}) {
@@ -776,6 +833,10 @@
         if (event.target === document.getElementById('viewDocumentModal')) closeViewDocumentModal();
     };
 
+    // Инициализация маски для ИНН при загрузке страницы (на случай если модальное окно уже открыто)
+    const initialInnField = document.getElementById('inn');
+    if (initialInnField) setupInnMask(initialInnField);
+    
     loadData();
     loadDocuments();
 </script>
