@@ -250,7 +250,6 @@
 </head>
 <body>
 
-
     <div class="container">
         <div class="login-wrapper">
             <div class="login-header">
@@ -328,5 +327,36 @@
         </div>
     </div>
     </footer>
+    <script>
+        async function login() {
+            const login = document.querySelector('input[type="text"]').value;
+            const password = document.querySelector('input[type="password"]').value;
+
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, password })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Ошибка входа');
+                return;
+            }
+
+            // 🔥 СОХРАНЯЕМ ПОЛЬЗОВАТЕЛЯ
+            localStorage.setItem('user', JSON.stringify({
+                token: data.token,
+                role: data.role,
+                login: data.login
+            }));
+
+            window.location.href = 'index.html';
+        }
+
+        // привязка к кнопке
+        document.querySelector('.login-button').addEventListener('click', login);
+</script>
 </body>
 </html>
